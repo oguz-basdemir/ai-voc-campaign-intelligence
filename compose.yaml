@@ -1,0 +1,31 @@
+services:
+  api:
+    build: .
+    ports: ["127.0.0.1:8000:8000"]
+    environment:
+      VOC_DB_PATH: /app/storage/voc.db
+      VOC_LLM_BASE_URL: ${VOC_LLM_BASE_URL:-https://api.openai.com/v1}
+      VOC_LLM_API_KEY: ${VOC_LLM_API_KEY:-}
+      VOC_LLM_MODEL: ${VOC_LLM_MODEL:-gpt-4.1-mini}
+    volumes: ["voc-data:/app/storage"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+  dashboard:
+    build: .
+    command: ["streamlit", "run", "app.py", "--server.address=0.0.0.0", "--server.port=8501"]
+    ports: ["127.0.0.1:8501:8501"]
+    environment:
+      VOC_API_URL: http://api:8000
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8501/_stcore/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+volumes:
+  voc-data:

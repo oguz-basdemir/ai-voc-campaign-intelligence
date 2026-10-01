@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.env
+*.db
+*.db-shm
+*.db-wal
+*.egg-info/
+build/
+dist/
+data/uploads/
+docs/screenshots/browser-downloaded-report.md
+pytest-cache-files-*/
